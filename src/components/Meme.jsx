@@ -1,27 +1,38 @@
-import React from "react";
-import memesData from "../memesData";
+import React from "react"
 
 export default function Meme() {
-//    const [memeImage, setMemeImage] = React.useState("http://i.imgflip.com/1bij.jpg")
-      const [meme, setMeme] = React.useState({
-            topText: "",
-            bottomText: "",
-            randomImage: "http://i.imgflip.com/1bij.jpg"
-      })    
-      
-      const [allMemeImges, setAllMemeImges] = React.useState(memesData)
-
+    /**
+     * Challenge: 
+     * Try to figure out why our code is broken! 😞
+     * 
+     * Hint: it has to do with the difference between
+     * what we were importing before from memesData.js
+     * and what we're setting our state as with `allMemes`
+     */
+    
+    const [meme, setMeme] = React.useState({
+        topText: "",
+        bottomText: "",
+        randomImage: "http://i.imgflip.com/1bij.jpg" 
+    })
+    const [allMemes, setAllMemes] = React.useState([])
+    
+    React.useEffect(() => {
+        fetch("https://api.imgflip.com/get_memes")
+            .then(res => res.json())
+            .then(data => setAllMemes(data.data.memes))
+    }, [])
+    
     function getMemeImage() {
-        const memesArray = allMemeImges.data.memes
-        const randomNumber = Math.floor(Math.random() * memesArray.length)
-        const url = memesArray[randomNumber].url
-        setMeme(prevMeme => ({          
+        const randomNumber = Math.floor(Math.random() * allMemes.length)
+        const url = allMemes[randomNumber].url
+        setMeme(prevMeme => ({
             ...prevMeme,
             randomImage: url
-        }))  
-       
+        }))
+        
     }
-
+    
     function handleChange(event) {
         const {name, value} = event.target
         setMeme(prevMeme => ({
@@ -29,7 +40,8 @@ export default function Meme() {
             [name]: value
         }))
     }
-    return(
+    
+    return (
         <main>
             <div className="form">
                 <input 
@@ -51,17 +63,15 @@ export default function Meme() {
                 <button 
                     className="form--button"
                     onClick={getMemeImage}
-                    
                 >
                     Get a new meme image 🖼
                 </button>
             </div>
             <div className="meme">
-                <img src={meme.randomImage} className="meme--image"/>
+                <img src={meme.randomImage} className="meme--image" />
                 <h2 className="meme--text top">{meme.topText}</h2>
                 <h2 className="meme--text bottom">{meme.bottomText}</h2>
             </div>
-            
         </main>
     )
 }
